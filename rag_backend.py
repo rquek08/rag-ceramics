@@ -46,7 +46,7 @@ docstore_path = hf_hub_download(
 # === Load index and docstore ===
 index = faiss.read_index(faiss_index_path)
 with open(docstore_path, "rb") as f:
-    docstore_data = pickle.load(f)
+    docstore_data, index_to_docstore_id = pickle.load(f)
 
 # Ensure docstore is an InMemoryDocstore
 if not isinstance(docstore_data, InMemoryDocstore):
@@ -55,7 +55,7 @@ else:
     docstore = docstore_data
 
 # === Create vector store ===
-vector_store = FAISS(embedding_fn.embed_query, index, docstore)
+vector_store = FAISS(embedding_fn.embed_query, index, docstore, index_to_docstore_id)
 
 # === LangGraph State ===
 class State(TypedDict):
