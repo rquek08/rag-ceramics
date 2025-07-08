@@ -1,51 +1,54 @@
 import streamlit as st
 from rag_backend import run_rag_query
+from langchain_core.messages import HumanMessage, AIMessage
 
-st.set_page_config(page_title="RAG Demo", layout="wide")
-st.title("RAG for Ceramics!")
+st.set_page_config(page_title="RAG Chatbot for Ceramics", layout="wide")
+st.title("RAG Chatbot for Ceramics")
 
-# Initialize chat history in session state
+# Initialize session state
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 
-# For storing retrieved docs and scores for each assistant message
-if "retrievals" not in st.session_state:
-    st.session_state.retrievals = []
+# Show chat history
+for msg in st.session_state.chat_history:
+    if isinstance(msg, HumanMessage):
+        with st.chat_message("user"):
+            st.markdown(msg.content)
+    elif isinstance(msg, AIMessage):
+        with st.chat_message("assistant"):
+            st.markdown(msg.content)
 
-query = st.text_input("Ask a question:")
+# Chat input
+user_input = st.chat_input("Ask something about ceramics...")
 
-if st.button("Submit"):
-    if query:
-        with st.spinner("Running RAG pipeline..."):
-            result = run_rag_query(query)
-        # Add user message
-        st.session_state.chat_history.append({"role": "user", "content": query})
-        # Add assistant message
-        st.session_state.chat_history.append({"role": "assistant", "content": result["answer"]})
-        # Store retrievals for this turn
-        st.session_state.retrievals.append({
-            "docs": result["retrieved_docs"],
-            "scores": result["similarity_scores"]
-        })
+if user_input:
+    # Display user message
+    with st.chat_message("user"):
+        st.markdown(user_input)
 
-# Display chat history in order
-for idx, msg in enumerate(st.session_state.chat_history):
-    if msg["role"] == "user":
-        st.markdown(f"**You:** {msg['content']}")
-    else:
-        st.markdown(f"**CeramicsBot:** {msg['content']}")
-        # Show retrieved files and scores for this assistant message
-        retrieval_idx = idx // 2  # Each user/assistant pair is one retrieval
-        if retrieval_idx < len(st.session_state.retrievals):
-            docs = st.session_state.retrievals[retrieval_idx]["docs"]
-            scores = st.session_state.retrievals[retrieval_idx]["scores"]
-            file_lines = []
-            for doc, score in zip(docs, scores):
-                file_name = doc["metadata"].get("source") or doc["metadata"].get("file_name") or "Unknown"
-                file_lines.append(f"{file_name} (Score: {score:.4f})")
-            if file_lines:
-                st.caption("Files Used for Retrieved Context:")
-                st.code("\n".join(file_lines), language="markdown")
+    # Run RAG
+    with st.spinner("Thinking..."):
+        result = run_rag_query(user_input)
 
-langsmith_link = "https://smith.langchain.com"  # Replace if you're capturing a run URL
-st.markdown(f"View trace in [LangSmith]({langsmith_link})")
+    ai_response = result["answer"]
+
+    # Store in history
+    st.session_state.chat_history.append(HumanMessage(content=user_input))
+    st.session_state.chat_history.append(AIMessage(content=ai_response))
+
+    # Display AI response
+    with st.chat_message("assistant"):
+        st.markdown(ai_response)
+
+        # Optional: show retrieved sources
+        file_names = []
+        for doc in result["retrieved_docs"]:
+            file_name = doc["metadata"].get("source") or doc["metadata"].get("file_name") or "Unknown"
+            file_names.append(file_name)
+        unique_file_names = list(dict.fromkeys(file_names))
+
+        with st.expander("📄 Files Used for Context"):
+            st.code("\n".join(unique_file_names), language="markdown")
+
+        langsmith_link = "https://smith.langchain.com"
+        st.markdown(f"View trace in [LangSmith]({langsmith_link})")
