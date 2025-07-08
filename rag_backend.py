@@ -49,7 +49,7 @@ with open(docstore_path, "rb") as f:
     docstore = pickle.load(f)
 
 # === Create vector store ===
-vector_store = FAISS(embedding_fn.embed_query, index, docstore, InMemoryDocstore({}))
+vector_store = FAISS(embedding_fn.embed_query, index, docstore)
 
 # === LangGraph State ===
 class State(TypedDict):
