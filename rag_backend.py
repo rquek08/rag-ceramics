@@ -46,7 +46,13 @@ docstore_path = hf_hub_download(
 # === Load index and docstore ===
 index = faiss.read_index(faiss_index_path)
 with open(docstore_path, "rb") as f:
-    docstore = pickle.load(f)
+    docstore_data = pickle.load(f)
+
+# Ensure docstore is an InMemoryDocstore
+if not isinstance(docstore_data, InMemoryDocstore):
+    docstore = InMemoryDocstore(docstore_data)
+else:
+    docstore = docstore_data
 
 # === Create vector store ===
 vector_store = FAISS(embedding_fn.embed_query, index, docstore)
