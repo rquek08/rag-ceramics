@@ -15,15 +15,14 @@ if st.button("Submit"):
         st.write(result["answer"])
 
         # Show the file names of the retrieved documents
-        file_names = []
-        for doc in result["retrieved_docs"]:
-            # Try common metadata keys for file name
+        file_names_with_scores = []
+        for doc, score in zip(result["retrieved_docs"], result.get("similarity_scores", [])):
             file_name = doc["metadata"].get("source") or doc["metadata"].get("file_name") or "Unknown"
-            file_names.append(file_name)
-        unique_file_names = list(dict.fromkeys(file_names))  # Remove duplicates, preserve order
+            file_names_with_scores.append(f"{file_name} (Score: {score:.4f})")
+        unique_file_names_with_scores = list(dict.fromkeys(file_names_with_scores))  # Remove duplicates, preserve order
 
-        st.subheader("Files Used for Retrieved Context:")
-        st.code("\n".join(unique_file_names), language="markdown")
+        st.subheader("Files Used for Retrieved Context (with Similarity Scores):")
+        st.code("\n".join(unique_file_names_with_scores), language="markdown")
 
         langsmith_link = "https://smith.langchain.com"  # Replace if you're capturing a run URL
         st.markdown(f"View trace in [LangSmith]({langsmith_link})")
