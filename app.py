@@ -48,4 +48,4 @@ for idx, msg in enumerate(st.session_state.chat_history):
                 st.code("\n".join(file_lines), language="markdown")
 
 langsmith_link = "https://smith.langchain.com"  # Replace if you're capturing a run URL
-st.markdown(f"View trace in
+st.markdown(f"View trace in [LangSmith]({langsmith_link})")
