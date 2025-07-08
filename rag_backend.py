@@ -104,6 +104,8 @@ builder.set_finish_point("generate")
 graph = builder.compile()
 
 # === Streamlit integration ===
+chat_history = []
+
 def run_rag_query(user_input):
     chat_history.append(HumanMessage(content=user_input))
     state = {
