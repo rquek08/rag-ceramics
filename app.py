@@ -7,6 +7,8 @@ st.title("Ceramics RAG Chatbot")
 # Initialize session state
 if "messages" not in st.session_state:
     st.session_state.messages = []
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = []
 
 # Display previous messages
 for message in st.session_state.messages:
@@ -24,7 +26,8 @@ if prompt := st.chat_input("Ask a question about ceramics..."):
     with st.chat_message("assistant"):
         with st.spinner("Retrieving information..."):
             try:
-                result = run_rag_query(prompt)
+                # Pass chat history to your backend
+                result = run_rag_query(prompt, st.session_state.chat_history)
                 answer = result["answer"]
             except Exception as e:
                 answer = f"Error: {str(e)}"
@@ -43,7 +46,3 @@ if prompt := st.chat_input("Ask a question about ceramics..."):
 
             with st.expander("Files Used for Retrieved Context"):
                 st.code("\n".join(unique_file_names), language="markdown")
-
-        # Add LangSmith trace link
-        langsmith_link = "https://smith.langchain.com"
-        st.markdown(f"[View trace in LangSmith]({langsmith_link})")
