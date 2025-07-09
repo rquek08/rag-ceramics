@@ -106,7 +106,7 @@ graph = builder.compile()
 # === Streamlit integration ===
 chat_history = []
 
-def run_rag_query(user_input):
+def run_rag_query(user_input, chat_history):
     chat_history.append(HumanMessage(content=user_input))
     state = {
         "messages": chat_history,
