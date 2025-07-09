@@ -68,7 +68,7 @@ def retrieve(state: State) -> dict:
     results_with_scores = vector_store.similarity_search_with_score(query, k=8)
 
     # Set your threshold here
-    THRESHOLD = 1
+    THRESHOLD = 1.25
 
     # Filter out results above the threshold
     filtered = [(doc, score) for doc, score in results_with_scores if score <= THRESHOLD]
