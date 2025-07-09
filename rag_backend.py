@@ -67,8 +67,14 @@ def retrieve(state: State) -> dict:
     query = user_msg.content
     results_with_scores = vector_store.similarity_search_with_score(query, k=8)
 
-    retrieved_docs = [doc for doc, score in results_with_scores]
-    similarity_scores = [score for doc, score in results_with_scores]
+    # Set your threshold here
+    THRESHOLD = 1
+
+    # Filter out results above the threshold
+    filtered = [(doc, score) for doc, score in results_with_scores if score <= THRESHOLD]
+
+    retrieved_docs = [doc for doc, score in filtered]
+    similarity_scores = [score for doc, score in filtered]
 
     return {
         "messages": state["messages"],
