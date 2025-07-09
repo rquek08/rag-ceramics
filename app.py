@@ -38,11 +38,9 @@ if prompt := st.chat_input("Ask a question about ceramics..."):
 
         # Show retrieved file names and retrieved chunks
         if result.get("retrieved_docs"):
-            file_lines = []
-            for doc in result["retrieved_docs"]:
-                file_name = doc["metadata"].get("source") or doc["metadata"].get("file_name") or "Unknown"
-                chunk = doc.get("page_content", "") if hasattr(doc, "page_content") else doc.get("content", "")
-                file_lines.append(f"File: {file_name}\n\nChunk:\n{chunk}\n{'-'*30}")
-
             with st.expander("Files and Chunks Used for Retrieved Context"):
-                st.markdown("\n\n".join(file_lines))
+                for doc in result["retrieved_docs"]:
+                    file_name = doc["metadata"].get("source") or doc["metadata"].get("file_name") or "Unknown"
+                    chunk = doc.get("page_content", "") if hasattr(doc, "page_content") else doc.get("content", "")
+                    st.write(f"**File:** {file_name}")
+                    st.code(chunk)
