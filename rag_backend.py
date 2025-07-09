@@ -27,7 +27,7 @@ llm = init_chat_model("gpt-4.1-mini", model_provider="openai")
 embedding_fn = OpenAIEmbeddings(model="text-embedding-3-small")
 
 # === Load FAISS index and docstore from Hugging Face ===
-REPO_ID = "rachq/rag-ceramics"  
+REPO_ID = "Rach08/rag-ceramics"  
 
 faiss_index_path = hf_hub_download(
     repo_id=REPO_ID,
