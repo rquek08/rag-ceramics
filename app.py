@@ -36,23 +36,13 @@ if prompt := st.chat_input("Ask a question about ceramics..."):
         st.markdown(answer)
         st.session_state.messages.append({"role": "assistant", "content": answer})
 
-        # Show retrieved file names
-        #if result.get("retrieved_docs"):
-            #file_names = [
-                #doc["metadata"].get("source") or doc["metadata"].get("file_name") or "Unknown"
-                #for doc in result["retrieved_docs"]
-            #]
-            #unique_file_names = list(dict.fromkeys(file_names))
-
-            #with st.expander("Files Used for Retrieved Context"):
-                #st.code("\n".join(unique_file_names), language="markdown")
-
+        # Show retrieved file names and retrieved chunks
         if result.get("retrieved_docs"):
             file_lines = []
             for doc in result["retrieved_docs"]:
                 file_name = doc["metadata"].get("source") or doc["metadata"].get("file_name") or "Unknown"
-                chunk = doc["page_content"] if "page_content" in doc else doc.get("content", "")
-                file_lines.append(f"**File:** {file_name}\n\n**Chunk:**\n{chunk}\n{'-'*30}")
+                chunk = doc.get("page_content", "") if hasattr(doc, "page_content") else doc.get("content", "")
+                file_lines.append(f"File: {file_name}\n\nChunk:\n{chunk}\n{'-'*30}")
 
             with st.expander("Files and Chunks Used for Retrieved Context"):
                 st.markdown("\n\n".join(file_lines))
