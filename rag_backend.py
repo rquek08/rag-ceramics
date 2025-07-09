@@ -80,7 +80,8 @@ def retrieve(state: State) -> dict:
 def generate(state: State) -> dict:
     docs_content = "\n\n".join(doc.page_content for doc in state["context"])
     system_prompt = (
-        "You are an assistant for question-answering tasks. Use the context below to answer the question.\n\n"
+        "You are a ceramics expert assistant. Answer questions with deep knowledge of ceramics, using the provided context. "
+        "If the context is insufficient, say so. Be clear and concise.\n\n"
         f"Context:\n{docs_content}"
     )
 
